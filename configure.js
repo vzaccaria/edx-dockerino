@@ -22,12 +22,29 @@ generateProject(_ => {
         _.cmd("-hub cm 'update docs and history.md'")
     })
 
+    _.collect("devloop", _ => {
+        _.cmd("make buildloop &")
+        _.cmd("make testloop &")
+    })
+
+    _.collect("buildloop", _ => {
+            _.cmd("./node_modules/.bin/babel src -d lib --watch --presets es2015,stage-2")
+    })
+
+    _.collect("testloop", _ => {
+            _.cmd("./node_modules/.bin/mocha -w ./lib/test.js")
+    })
+
     _.collectSeq("all", _ => {
         _.collect("build", _ => {
             _.cmd("./node_modules/.bin/babel src -d lib --presets es2015,stage-2")
         })
         _.cmd("((echo '#!/usr/bin/env node') && cat ./lib/index.js) > index.js", "./lib/index.js")
         _.cmd("chmod +x ./index.js")
+    })
+
+    _.collect("start", _ => {
+        _.cmd("npm start");
     })
 
     _.collect("test", _ => {
