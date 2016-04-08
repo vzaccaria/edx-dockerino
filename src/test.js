@@ -8,15 +8,15 @@ let _ = require('lodash')
 require('babel-polyfill')
 
 
-let debug = require( 'debug')
-let uid = require( 'uid')
+let debug = require('debug')
+let uid = require('uid')
 let os = require('os')
 let bluebird = require('bluebird')
 let shelljs = require('shelljs')
 let fs = require('fs')
 let mm = require('mm')
 
-let pshelljs = bluebird.promisifyAll(shelljs);
+let pshelljs = shelljs;
 let pfs = bluebird.promisifyAll(fs)
 let co = bluebird.coroutine
 
@@ -26,13 +26,15 @@ let co = bluebird.coroutine
  * @return {promise}     A promise for the command output
  */
 
-let utils = { uid }
+let utils = {
+    uid
+}
 
 /*global describe, it, before, beforeEach, after, afterEach */
 
 let _module = require('./payload');
 _module = _module({
-    _, debug, utils, os, pshelljs, pfs, co, process
+    _, debug, utils, os, pshelljs, pfs, co, process, bluebird
 })
 
 describe('#payload module', () => {
@@ -62,18 +64,51 @@ describe('#runPayload', () => {
     mm(os, 'tmpdir', () => "/tmp/bar")
     mm(pshelljs, 'mkdir', (x, y) => record.dirCreated = y)
     mm(pshelljs, 'rmdir', (x, y) => record.dirRemoved = y)
-    mm(pshelljs, 'exec', (c, cb) => { record.commandExecuted = c; cb(0, 'ok') })
     mm(pshelljs, 'test', () => true)
     mm(process, 'cwd', (y) => record.changedDir = y)
     mm(pfs, 'writeFile', (f, d, o, cb) => {
         record.fileWritten = f, record.dataWritten = d;
         cb(0)
     })
+    _module.setup()
+
     it('Should create sandbox and execute a script in it', () => {
-        _module.setup()
-        expect(_module.runPayload(payload).then(() => {
-            expect(record).to.contain({commandExecuted: "/usr/bin/octave --silent /tmp/bar/1/script.m" })
-        })).to.eventually.resolve
+        record = {}
+        mm(pshelljs, 'exec', (c, opts, cb) => {
+            record.commandExecuted = c;
+            cb(33, 'ok')
+        })
+        return _module.runPayload(payload).then((v) => {
+            expect(record).to.contain({
+                commandExecuted: "/usr/bin/octave --silent /tmp/bar/1/script.m"
+            })
+            expect(v).to.deep.equal({
+                executed: true,
+                result: {
+                    code: 33,
+                    stdout: 'ok'
+                }
+            })
+        }).should.eventually.be.fulfilled
+    })
+
+    it('Should remove sandbox when exec fails', () => {
+        record = {}
+        mm(pshelljs, 'exec', (c, opts, cb) => {
+            throw "Ai!"
+        })
+        return _module.runPayload(payload).then((v) => {
+            expect(record).to.not.contain({
+                commandExecuted: "/usr/bin/octave --silent /tmp/bar/1/script.m"
+            })
+            expect(record).to.contain({
+                dirRemoved: '/tmp/bar/1'
+            })
+            expect(v).to.deep.equal({
+                executed: false
+            })
+
+        }).should.eventually.be.fulfilled
     })
 
 })

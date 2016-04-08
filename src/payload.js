@@ -12,12 +12,23 @@ function createScript({
 }
 
 let _module = ({
-    co, _, debug, utils, os, pshelljs, pfs, process
+    co, _, debug, utils, os, pshelljs, pfs, process, bluebird
 }) => {
     let octaveCommand = undefined
-    if (_.any([co, debug, utils, os, pshelljs, pfs, process], _.isUndefined)) {
+
+    if (_.any([co, debug, utils, os, pshelljs, pfs, process, bluebird], _.isUndefined)) {
         return undefined
     }
+
+    let execAsync = (cmd) => {
+        return new bluebird((resolve) => {
+            pshelljs.exec(cmd, {async: true}, (code, stdout) => {
+                resolve({code, stdout})
+            })
+        })
+    }
+
+
     return {
 
         runPayload: co(function*(payload) {
@@ -31,11 +42,16 @@ let _module = ({
                 let script = createScript(payload)
                 yield pfs.writeFileAsync(`${sandboxdir}/script.m`, script, 'utf8')
                 process.cwd(sandboxdir)
-                yield pshelljs.execAsync(`${octaveCommand} --silent ${sandboxdir}/script.m`);
-                return true;
+                let r = yield execAsync(`${octaveCommand} --silent ${sandboxdir}/script.m`);
+                return {
+                    executed: true,
+                    result: r
+                };
             } catch (e) {
                 pshelljs.rmdir('-f', sandboxdir);
-                throw (e)
+                return {
+                    executed: false
+                };
             }
             pshelljs.rmdir('-f', sandboxdir);
         }),
