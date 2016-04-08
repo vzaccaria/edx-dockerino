@@ -27,6 +27,7 @@ Executes an EDX payload with the following schema:
     code {
     base, solution, validation, context, lang
     }
+    response
 }
 ```
 

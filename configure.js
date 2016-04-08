@@ -35,6 +35,11 @@ generateProject(_ => {
             _.cmd("./node_modules/.bin/mocha -w ./lib/test.js")
     })
 
+    _.collect("stoploop", _ => {
+        _.cmd("-pkill -9 -f '.*mocha.*'")
+        _.cmd("-pkill -9 -f '.*babel.*watch.*'")
+    })
+
     _.collectSeq("all", _ => {
         _.collect("build", _ => {
             _.cmd("./node_modules/.bin/babel src -d lib --presets es2015,stage-2")
@@ -51,6 +56,8 @@ generateProject(_ => {
         _.cmd("make all")
         _.cmd("./node_modules/.bin/mocha ./lib/test.js")
     })
+
+
 
     _.collect("update", _ => {
         _.cmd("make clean && ./node_modules/.bin/babel --presets es2015,stage-2 configure.js | node")
