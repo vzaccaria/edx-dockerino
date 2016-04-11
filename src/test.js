@@ -58,7 +58,7 @@ let payload = {
     response: "a = 1"
 }
 
-describe('#runPayload', () => {
+describe('#runPayload (mocked deps)', () => {
     let record = {}
     mm(utils, 'uid', () => 1)
     mm(os, 'tmpdir', () => "/tmp/bar")
@@ -72,7 +72,7 @@ describe('#runPayload', () => {
     })
     _module.setup()
 
-    it('Should create sandbox and execute a script in it', () => {
+    it('Should create sandbox, execute a script in it and return exit code', () => {
         record = {}
         mm(pshelljs, 'exec', (c, opts, cb) => {
             record.commandExecuted = c;
@@ -89,7 +89,7 @@ describe('#runPayload', () => {
                     stdout: 'ok'
                 }
             })
-        }).should.eventually.be.fulfilled
+        }).should.be.fulfilled
     })
 
     it('Should remove sandbox when exec fails', () => {
@@ -108,14 +108,44 @@ describe('#runPayload', () => {
                 executed: false
             })
 
-        }).should.eventually.be.fulfilled
+        }).should.be.fulfilled
     })
 
 })
 
-describe('#octave', () => {
-    mm(pshelljs, 'test', () => true)
-    it("Should detect octave", () => {
-        expect(_module.setup()).to.not.throw
+let $ = (it) => JSON.stringify(it, 0, 4)
+let b64 = require('base64-url')
+
+let packet = (anonimized_id, response, payload) => {
+    return {
+        xqueue_body: $({
+
+            student_info: $({
+                anonimized_id
+            }),
+
+            student_response: response,
+
+            grader_payload: $({
+                payload: b64.encode($(payload))
+            })
+        })
+    }
+}
+
+describe('#server (mocked deps)', () => {
+    let server = require('./server')
+    it('Should export startServer', () => {
+        expect(server.startServer).to.exist
     })
+    it('Should export extractPayload', () => {
+        expect(server.extractPayload).to.exist
+    })
+    it('extractPayload should decode a xqueue body correctly', () => {
+        let inf = server.extractPayload(packet(237, "Spooky answer", { lang: 'c' }))
+        expect(inf.student_info).to.be.deep.equal({anonimized_id: 237});
+        expect(inf.grader_payload).to.contain({lang: 'c'});
+
+    })
+
 })

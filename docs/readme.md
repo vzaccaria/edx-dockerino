@@ -43,6 +43,11 @@ No schema needed; returns:
 * OK, server ready
 * BUSY, server busy (candidate for destruction)
 
+### `post /kill`
+
+* Tries to kill executing program
+
+
 ## Author
 
 * Vittorio Zaccaria
