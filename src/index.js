@@ -1,13 +1,28 @@
 import "babel-polyfill";
 
-import { warn, info } from './messages'
+import { warn, info } from './lib/messages'
 
 let {
     $d, $o, $f
     // $r.stdin() -> Promise  ;; to read from stdin
 } = require('zaccaria-cli')
 
-import { startServer } from './server'
+let _ = require('lodash')
+let debug = require('debug')
+let uid = require('uid')
+let os = require('os')
+let bluebird = require('bluebird')
+let shelljs = require('shelljs')
+let fs = require('fs')
+let pshelljs = shelljs;
+let pfs = bluebird.promisifyAll(fs)
+let co = bluebird.coroutine
+let utils = {
+    uid
+}
+
+let { startServer } = require('./lib/server')({_, debug, utils, os, pshelljs, pfs, co, process, bluebird})
+
 
 let getOptions = doc => {
     "use strict"

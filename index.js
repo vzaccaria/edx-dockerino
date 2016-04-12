@@ -3,9 +3,7 @@
 
 require('babel-polyfill');
 
-var _messages = require('./messages');
-
-var _server = require('./server');
+var _messages = require('./lib/messages');
 
 var _require =
 // $r.stdin() -> Promise  ;; to read from stdin
@@ -14,6 +12,25 @@ require('zaccaria-cli');
 var $d = _require.$d;
 var $o = _require.$o;
 var $f = _require.$f;
+
+
+var _ = require('lodash');
+var debug = require('debug');
+var uid = require('uid');
+var os = require('os');
+var bluebird = require('bluebird');
+var shelljs = require('shelljs');
+var fs = require('fs');
+var pshelljs = shelljs;
+var pfs = bluebird.promisifyAll(fs);
+var co = bluebird.coroutine;
+var utils = {
+    uid: uid
+};
+
+var _require2 = require('./lib/server')({ _: _, debug: debug, utils: utils, os: os, pshelljs: pshelljs, pfs: pfs, co: co, process: process, bluebird: bluebird });
+
+var startServer = _require2.startServer;
 
 
 var getOptions = function getOptions(doc) {
@@ -37,7 +54,7 @@ var main = function main() {
         if (help) {
             console.log(it);
         } else {
-            (0, _server.startServer)(port);
+            startServer(port);
         }
     });
 };
