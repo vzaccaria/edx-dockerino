@@ -14,11 +14,16 @@ let os = require('os')
 let bluebird = require('bluebird')
 let shelljs = require('shelljs')
 let fs = require('fs')
+
 let mm = require('mm')
+mm.restore()
 
 let pshelljs = shelljs;
 let pfs = bluebird.promisifyAll(fs)
 let co = bluebird.coroutine
+
+let agent = require('superagent-promise')(require('superagent'), bluebird);
+
 
 /**
  * Promised version of shelljs exec
@@ -58,26 +63,43 @@ let payload = {
     response: "a = 1"
 }
 
-describe('#runPayload (mocked deps)', () => {
-    let record = {}
+let record = {}
+
+function mockModulesForGood(fail) {
+    record = {}
+    mm.restore()
     mm(utils, 'uid', () => 1)
     mm(os, 'tmpdir', () => "/tmp/bar")
     mm(pshelljs, 'mkdir', (x, y) => record.dirCreated = y)
     mm(pshelljs, 'rmdir', (x, y) => record.dirRemoved = y)
-    mm(pshelljs, 'test', () => true)
+    mm(pshelljs, 'test', (o, f) => (f === '/usr/bin/octave') ? true : false)
     mm(process, 'cwd', (y) => record.changedDir = y)
     mm(pfs, 'writeFile', (f, d, o, cb) => {
         record.fileWritten = f, record.dataWritten = d;
         cb(0)
     })
-    _module.setup()
-
-    it('Should create sandbox, execute a script in it and return exit code', () => {
-        record = {}
+    if (!fail) {
         mm(pshelljs, 'exec', (c, opts, cb) => {
             record.commandExecuted = c;
-            cb(33, 'ok')
+            cb(0, 'ok')
         })
+    } else {
+        mm(pshelljs, 'exec', (c, opts, cb) => {
+            throw "Ai!"
+        })
+    }
+}
+
+function mockRestore() {
+    mm.restore()
+}
+
+
+describe('#runPayload (mocked deps)', () => {
+    it('Should create sandbox, execute a script in it and return exit code', () => {
+        mockModulesForGood(false)
+        _module.setup()
+        record = {}
         return _module.runPayload(payload).then((v) => {
             expect(record).to.contain({
                 commandExecuted: "/usr/bin/octave --silent /tmp/bar/1/script.m"
@@ -85,18 +107,16 @@ describe('#runPayload (mocked deps)', () => {
             expect(v).to.deep.equal({
                 executed: true,
                 result: {
-                    code: 33,
+                    code: 0,
                     stdout: 'ok'
                 }
             })
-        }).should.be.fulfilled
+        })
     })
 
     it('Should remove sandbox when exec fails', () => {
         record = {}
-        mm(pshelljs, 'exec', (c, opts, cb) => {
-            throw "Ai!"
-        })
+        mockModulesForGood(true)
         return _module.runPayload(payload).then((v) => {
             expect(record).to.not.contain({
                 commandExecuted: "/usr/bin/octave --silent /tmp/bar/1/script.m"
@@ -134,7 +154,10 @@ let packet = (anonimized_id, response, payload) => {
 }
 
 describe('#server (mocked deps)', () => {
-    let server = require('./server')
+    let server = require('./server')({
+        _, debug, utils, os, pshelljs, pfs, co, process, bluebird
+    })
+    let examplePacket = packet(237, "Spooky answer", payload);
     it('Should export startServer', () => {
         expect(server.startServer).to.exist
     })
@@ -142,10 +165,67 @@ describe('#server (mocked deps)', () => {
         expect(server.extractPayload).to.exist
     })
     it('extractPayload should decode a xqueue body correctly', () => {
-        let inf = server.extractPayload(packet(237, "Spooky answer", { lang: 'c' }))
-        expect(inf.student_info).to.be.deep.equal({anonimized_id: 237});
-        expect(inf.grader_payload).to.contain({lang: 'c'});
+        let inf = server.extractPayload(examplePacket)
+        expect(inf.student_info).to.be.deep.equal({
+            anonimized_id: 237
+        });
+        expect(inf.grader_payload).to.be.deep.equal(payload)
 
     })
+})
 
+describe('#server (API)', () => {
+    mm.restore()
+    let server = require('./server')({
+        _, debug, utils, os, pshelljs, pfs, co, process, bluebird
+    })
+
+    let examplePacket = packet(237, "Spooky answer", payload);
+    let app
+    before(() => {
+        app = server.startServer()
+    })
+    it('API call should trigger program execution', () => {
+        mockModulesForGood(false)
+        return agent.post('http://localhost:3000/payload').set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
+            expect(record).to.be.deep.equal({
+                dirCreated: '/tmp/bar/1',
+                dirRemoved: '/tmp/bar/1',
+                fileWritten: '/tmp/bar/1/script.m',
+                dataWritten: '\n    -- no context\n    a = 1\n    assert(a==1)\n    ',
+                changedDir: '/tmp/bar/1',
+                commandExecuted: '/usr/bin/octave --silent /tmp/bar/1/script.m'
+            })
+            expect(resp.body).to.contain({
+                correct: true,
+                score: 1
+            })
+        })
+    })
+    it('API call should trigger program execution - program fails', () => {
+        mockModulesForGood(true)
+        return agent.post('http://localhost:3000/payload').set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
+            expect(record).to.be.deep.equal({
+                dirCreated: '/tmp/bar/1',
+                fileWritten: '/tmp/bar/1/script.m',
+                dataWritten: '\n    -- no context\n    a = 1\n    assert(a==1)\n    ',
+                changedDir: '/tmp/bar/1',
+                dirRemoved: '/tmp/bar/1'
+            })
+            expect(resp.body).to.contain({
+                correct: false,
+                score: 0
+            })
+        })
+    })
+
+    after(() => {
+        app.close()
+    })
+})
+
+describe('#test shutdown', () => {
+    after( () => {
+        mockRestore()
+    })
 })

@@ -43,6 +43,7 @@ let _module = ({
                 yield pfs.writeFileAsync(`${sandboxdir}/script.m`, script, 'utf8')
                 process.cwd(sandboxdir)
                 let r = yield execAsync(`${octaveCommand} --silent ${sandboxdir}/script.m`);
+                pshelljs.rmdir('-f', sandboxdir);
                 return {
                     executed: true,
                     result: r
@@ -53,7 +54,6 @@ let _module = ({
                     executed: false
                 };
             }
-            pshelljs.rmdir('-f', sandboxdir);
         }),
 
         setup: () => {
