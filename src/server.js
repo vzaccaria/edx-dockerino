@@ -58,7 +58,7 @@ let _module = (modules) => {
 
         router.post("/payload", processRequest);
 
-        router.post("/busy", function*() {
+        router.post("/status", function*() {
             if(isBusy()) {
                 this.response.status = 503 // server not available
             } else {
