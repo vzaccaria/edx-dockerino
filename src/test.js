@@ -218,6 +218,12 @@ describe('#server (API)', () => {
             })
         })
     })
+    it('API should expose status', () => {
+        mockModulesForGood(false)
+        return agent.post('http://localhost:3000/busy').end().then((resp) => {
+            expect(resp.status).to.be.equal(204)
+        })
+    })
 
     after(() => {
         app.close()

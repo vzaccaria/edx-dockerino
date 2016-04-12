@@ -8,7 +8,7 @@ let b64 = require('base64-url')
 let _module = (modules) => {
 
     let {
-        runPayload, setup
+        runPayload, setup, isBusy
     } = require('./payload')(modules)
 
     let extractPayload = function(req) {
@@ -57,6 +57,14 @@ let _module = (modules) => {
         app.use(router.routes());
 
         router.post("/payload", processRequest);
+
+        router.post("/busy", function*() {
+            if(isBusy()) {
+                this.response.status = 503 // server not available
+            } else {
+                this.response.status = 204 // ok, but no response
+            }
+        })
 
         let server = app.listen(port, () => {
             info(`App listening on port ${port}.`);

@@ -15,6 +15,7 @@ let _module = ({
     co, _, debug, utils, os, pshelljs, pfs, process, bluebird
 }) => {
     let octaveCommand = undefined
+    let _isBusy = false
 
     if (_.any([co, debug, utils, os, pshelljs, pfs, process, bluebird], _.isUndefined)) {
         return undefined
@@ -31,8 +32,14 @@ let _module = ({
 
     return {
 
+        isBusy: function() {
+            return _isBusy
+        },
+
         runPayload: co(function*(payload) {
+            _isBusy = true
             if (payload.code.lang !== 'octave') {
+                _isBusy = false
                 throw "language not supported";
             }
             let tmpdir = os.tmpdir()
@@ -44,12 +51,14 @@ let _module = ({
                 process.cwd(sandboxdir)
                 let r = yield execAsync(`${octaveCommand} --silent ${sandboxdir}/script.m`);
                 pshelljs.rmdir('-f', sandboxdir);
+                _isBusy = false
                 return {
                     executed: true,
                     result: r
                 };
             } catch (e) {
                 pshelljs.rmdir('-f', sandboxdir);
+                _isBusy = false
                 return {
                     executed: false
                 };
