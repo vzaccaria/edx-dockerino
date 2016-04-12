@@ -32,7 +32,7 @@ Arguments:
 .fi
 .SS API
 .PP
-The server exposes two endpoints at port 5678
+The server exposes two endpoints at port 3000
 .SS \f[C]post\ /payload\f[]
 .PP
 Executes an EDX payload with the following schema:
@@ -50,17 +50,19 @@ Executes an EDX payload with the following schema:
 .PP
 Answers:
 .IP \[bu] 2
-OK, result payload
+200 \- OK, result payload
 .IP \[bu] 2
-SERVER ERROR, reason (e.g., cant find octave, something is already
-running)
+503 \- Server unavailable
 .SS \f[C]post\ /status\f[]
 .PP
 No schema needed; returns:
 .IP \[bu] 2
-OK, server ready
+204 \- server ready
 .IP \[bu] 2
-BUSY, server busy (candidate for destruction)
+503 \- Server unavailable (candidate for destruction)
+.SS Todo
+.PP
+Add the following API endpoints:
 .SS \f[C]post\ /kill\f[]
 .IP \[bu] 2
 Tries to kill executing program

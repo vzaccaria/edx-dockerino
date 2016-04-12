@@ -27,7 +27,7 @@ Arguments:
 
 ## API
 
-The server exposes two endpoints at port 5678
+The server exposes two endpoints at port 3000
 
 ### `post /payload`
 
@@ -44,15 +44,19 @@ Executes an EDX payload with the following schema:
 
 Answers:
 
-* OK, result payload
-* SERVER ERROR, reason (e.g., cant find octave, something is already running)
+* 200 - OK, result payload
+* 503 - Server unavailable
 
 ### `post /status`
 
 No schema needed; returns:
 
-* OK, server ready
-* BUSY, server busy (candidate for destruction)
+* 204 - server ready
+* 503 - Server unavailable (candidate for destruction)
+
+## Todo
+
+Add the following API endpoints:
 
 ### `post /kill`
 
