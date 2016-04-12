@@ -83,4 +83,5 @@ Released under the BSD License.
 
 # Bug fixes
 
+-     change api endpoint name for the better -- [Apr 12th 16](../../commit/c8f7257c86ea6e144f8126c5c5a394dbe5761fd3)
 -     inject deps into the app -- [Apr 12th 16](../../commit/5b29f476495df71b3037313536a33d812f5e0492)
