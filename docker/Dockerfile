@@ -5,3 +5,4 @@ RUN apt-get update
 RUN apt-get install -y octave
 RUN npm i vz-dockerino -g
 CMD ["vz-dockerino"]
+EXPOSE 3000

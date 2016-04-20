@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ name: dockerino
+ labels:
+   app: web
+spec:
+ containers:
+   - name: dockerino
+     image: vzaccaria/dockerino
