@@ -59,8 +59,7 @@ let payload = {
         lang: 'octave',
         context: '-- no context',
         validation: 'assert(a==1)'
-    },
-    response: "a = 1"
+    }
 }
 
 let record = {}
@@ -70,8 +69,8 @@ function mockModulesForGood(fail) {
     mm.restore()
     mm(utils, 'uid', () => 1)
     mm(os, 'tmpdir', () => "/tmp/bar")
-    mm(pshelljs, 'mkdir', (x, y) => record.dirCreated = y)
-    mm(pshelljs, 'rmdir', (x, y) => record.dirRemoved = y)
+    mm(pshelljs, 'mkdir', (x, y) => { record.dirCreated = y })
+    mm(pshelljs, 'rm', (x, y) => { record.dirRemoved = y })
     mm(pshelljs, 'test', (o, f) => (f === '/usr/bin/octave') ? true : false)
     mm(process, 'cwd', (y) => record.changedDir = y)
     mm(pfs, 'writeFile', (f, d, o, cb) => {
@@ -117,7 +116,7 @@ describe('#runPayload (mocked deps)', () => {
     it('Should remove sandbox when exec fails', () => {
         record = {}
         mockModulesForGood(true)
-        return _module.runPayload(payload).then((v) => {
+        return _module.runPayload(payload, 'a=1').then((v) => {
             expect(record).to.not.contain({
                 commandExecuted: "/usr/bin/octave --silent /tmp/bar/1/script.m"
             })
@@ -180,7 +179,7 @@ describe('#server (API)', () => {
         _, debug, utils, os, pshelljs, pfs, co, process, bluebird
     })
 
-    let examplePacket = packet(237, "Spooky answer", payload);
+    let examplePacket = packet(237, "a = 2", payload);
     let app
     before(() => {
         app = server.startServer()
@@ -192,7 +191,7 @@ describe('#server (API)', () => {
                 dirCreated: '/tmp/bar/1',
                 dirRemoved: '/tmp/bar/1',
                 fileWritten: '/tmp/bar/1/script.m',
-                dataWritten: '\n    -- no context\n    a = 1\n    assert(a==1)\n    ',
+                dataWritten: '\n    -- no context\n    a = 2\n    assert(a==1)\n    ',
                 changedDir: '/tmp/bar/1',
                 commandExecuted: '/usr/bin/octave --silent /tmp/bar/1/script.m'
             })
@@ -208,7 +207,7 @@ describe('#server (API)', () => {
             expect(record).to.be.deep.equal({
                 dirCreated: '/tmp/bar/1',
                 fileWritten: '/tmp/bar/1/script.m',
-                dataWritten: '\n    -- no context\n    a = 1\n    assert(a==1)\n    ',
+                dataWritten: '\n    -- no context\n    a = 2\n    assert(a==1)\n    ',
                 changedDir: '/tmp/bar/1',
                 dirRemoved: '/tmp/bar/1'
             })

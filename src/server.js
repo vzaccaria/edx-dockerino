@@ -40,7 +40,7 @@ let _module = (modules) => {
     function* processRequest() {
         let body = yield parse.json(this.req)
         let payload = extractPayload(body)
-        let resp = yield runPayload(payload.grader_payload)
+        let resp = yield runPayload(payload.grader_payload, payload.student_response)
         this.body = generateResponse(resp)
         this.response.status = 200
     }

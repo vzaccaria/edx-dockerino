@@ -25,10 +25,10 @@ let agent = require('superagent-promise')(require('superagent'), bluebird);
 let payload = {
     code: {
         lang: 'octave',
-        context: '-- no context',
+        context: '',
         validation: 'assert(a==1)'
     },
-    response: "a = 1"
+    response: "a=1"
 }
 
 let $ = (it) => JSON.stringify(it, 0, 4)
@@ -55,7 +55,7 @@ describe('#server (API)', () => {
 
     let examplePacket = packet(237, "Spooky answer", payload);
     it('API call should trigger program execution', () => {
-        console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`)
+        // console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`)
         return agent.post('http://localhost:3000/payload').set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(resp.body).to.contain({
                 correct: true,

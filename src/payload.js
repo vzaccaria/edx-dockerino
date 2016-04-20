@@ -1,12 +1,12 @@
 function createScript({
-    code, response
-}) {
+    code
+}, student_response) {
     let {
         validation, context
     } = code
     return `
     ${context}
-    ${response}
+    ${student_response}
     ${validation}
     `
 }
@@ -36,7 +36,7 @@ let _module = ({
             return _isBusy
         },
 
-        runPayload: co(function*(payload) {
+        runPayload: co(function*(payload, student_response) {
             _isBusy = true
             if (payload.code.lang !== 'octave') {
                 _isBusy = false
@@ -44,20 +44,21 @@ let _module = ({
             }
             let tmpdir = os.tmpdir()
             let tuid = utils.uid()
-            let sandboxdir = pshelljs.mkdir('-p', `${tmpdir}/${tuid}`)
+            let sandboxdir = `${tmpdir}/${tuid}`
+            pshelljs.mkdir('-p', sandboxdir)
             try {
-                let script = createScript(payload)
+                let script = createScript(payload, student_response)
                 yield pfs.writeFileAsync(`${sandboxdir}/script.m`, script, 'utf8')
                 process.cwd(sandboxdir)
                 let r = yield execAsync(`${octaveCommand} --silent ${sandboxdir}/script.m`);
-                pshelljs.rmdir('-f', sandboxdir);
+                pshelljs.rm('-rf', sandboxdir);
                 _isBusy = false
                 return {
                     executed: true,
                     result: r
                 };
             } catch (e) {
-                pshelljs.rmdir('-f', sandboxdir);
+                pshelljs.rm('-rf', sandboxdir);
                 _isBusy = false
                 return {
                     executed: false
