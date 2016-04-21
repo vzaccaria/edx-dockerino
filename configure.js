@@ -57,6 +57,11 @@ generateProject(_ => {
         _.cmd("./node_modules/.bin/mocha ./lib/test.js")
     })
 
+    _.collect("test-local-endpoint", _ => {
+        _.cmd("make all")
+        _.cmd("mocha lib/testEndPoint.js")
+    })
+
 
 
     _.collect("update", _ => {
