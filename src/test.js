@@ -182,11 +182,11 @@ describe('#server (API)', () => {
     let examplePacket = packet(237, "a = 2", payload);
     let app
     before(() => {
-        app = server.startServer()
+        app = server.startServer(4000)
     })
     it('API call should trigger program execution', () => {
         mockModulesForGood(false)
-        return agent.post('http://localhost:3000/payload').set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
+        return agent.post('http://localhost:4000/payload').set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(record).to.be.deep.equal({
                 dirCreated: '/tmp/bar/1',
                 dirRemoved: '/tmp/bar/1',
@@ -203,7 +203,7 @@ describe('#server (API)', () => {
     })
     it('API call should trigger program execution - program fails', () => {
         mockModulesForGood(true)
-        return agent.post('http://localhost:3000/payload').set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
+        return agent.post('http://localhost:4000/payload').set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(record).to.be.deep.equal({
                 dirCreated: '/tmp/bar/1',
                 fileWritten: '/tmp/bar/1/script.m',
@@ -219,7 +219,7 @@ describe('#server (API)', () => {
     })
     it('API should expose status', () => {
         mockModulesForGood(false)
-        return agent.post('http://localhost:3000/status').end().then((resp) => {
+        return agent.post('http://localhost:4000/status').end().then((resp) => {
             expect(resp.status).to.be.equal(204)
         })
     })
