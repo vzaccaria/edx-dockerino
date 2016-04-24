@@ -33,6 +33,7 @@
     "camus-test": "0.1.8",
     "chai": "3.0.0",
     "chai-as-promised": "5.1.0",
+    "chalk": "1.1.3",
     "co-body": "4.0.0",
     "debug": "2.2.0",
     "diy-build": "1.0.8",
