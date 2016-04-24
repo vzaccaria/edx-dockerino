@@ -29,6 +29,7 @@
     "babel-preset-stage-2": "6.5.0",
     "babel-register": "6.7.2",
     "base64-url": "1.2.2",
+    "bluebird": "2.9.12",
     "camus-test": "0.1.8",
     "chai": "3.0.0",
     "chai-as-promised": "5.1.0",
@@ -47,6 +48,7 @@
     "stupid-replace": "0.0.3",
     "superagent": "1.8.3",
     "superagent-promise": "1.1.0",
+    "uid": "0.0.2",
     "xyz": "0.5.0",
     "zaccaria-cli": "0.2.0"
   }
