@@ -28,7 +28,9 @@ var utils = {
     uid: uid
 };
 
-var _require2 = require('./lib/server')({ _: _, debug: debug, utils: utils, os: os, pshelljs: pshelljs, pfs: pfs, co: co, process: process, bluebird: bluebird });
+var semaphore = require('promise-semaphore');
+
+var _require2 = require('./lib/server')({ _: _, debug: debug, utils: utils, os: os, pshelljs: pshelljs, pfs: pfs, co: co, process: process, bluebird: bluebird, semaphore: semaphore });
 
 var startServer = _require2.startServer;
 
@@ -39,8 +41,9 @@ var getOptions = function getOptions(doc) {
     var o = $d(doc);
     var help = $o('-h', '--help', false, o);
     var port = $o('-p', '--port', 3000, o);
+    var number = $o('-n', '--number', 1, o);
     return {
-        help: help, port: port
+        help: help, port: port, number: number
     };
 };
 
@@ -50,11 +53,12 @@ var main = function main() {
 
         var help = _getOptions.help;
         var port = _getOptions.port;
+        var number = _getOptions.number;
 
         if (help) {
             console.log(it);
         } else {
-            startServer(port);
+            startServer({ port: port, number: number });
         }
     });
 };

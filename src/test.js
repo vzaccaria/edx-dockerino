@@ -21,6 +21,7 @@ mm.restore()
 let pshelljs = shelljs;
 let pfs = bluebird.promisifyAll(fs)
 let co = bluebird.coroutine
+let semaphore = require('promise-semaphore')
 
 let agent = require('superagent-promise')(require('superagent'), bluebird);
 
@@ -98,7 +99,6 @@ describe('#runPayload (mocked deps)', () => {
     it('Should create sandbox, execute a script in it and return exit code', () => {
         mockModulesForGood(false)
         _module.setup()
-        record = {}
         return _module.runPayload(payload).then((v) => {
             expect(record).to.contain({
                 commandExecuted: "/usr/bin/octave --silent /tmp/bar/1/script.m"
@@ -114,7 +114,6 @@ describe('#runPayload (mocked deps)', () => {
     })
 
     it('Should remove sandbox when exec fails', () => {
-        record = {}
         mockModulesForGood(true)
         return _module.runPayload(payload, 'a=1').then((v) => {
             expect(record).to.not.contain({
@@ -154,7 +153,7 @@ let packet = (anonimized_id, response, payload) => {
 
 describe('#server (mocked deps)', () => {
     let server = require('./server')({
-        _, debug, utils, os, pshelljs, pfs, co, process, bluebird
+        _, debug, utils, os, pshelljs, pfs, co, process, bluebird, semaphore
     })
     let examplePacket = packet(237, "Spooky answer", payload);
     it('Should export startServer', () => {
@@ -176,13 +175,13 @@ describe('#server (mocked deps)', () => {
 describe('#server (API)', () => {
     mm.restore()
     let server = require('./server')({
-        _, debug, utils, os, pshelljs, pfs, co, process, bluebird
+        _, debug, utils, os, pshelljs, pfs, co, process, bluebird, semaphore
     })
 
     let examplePacket = packet(237, "a = 2", payload);
     let app
     before(() => {
-        app = server.startServer(4000)
+        app = server.startServer({port: 4000})
     })
     it('API call should trigger program execution', () => {
         mockModulesForGood(false)

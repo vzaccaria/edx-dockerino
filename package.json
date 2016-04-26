@@ -45,6 +45,8 @@
     "mocha": "2.4.5",
     "mustache": "2.1.2",
     "nodemon": "1.9.1",
+    "promise-semaphore": "0.2.7",
+    "semaphore": "1.0.5",
     "shelljs": "0.5.1",
     "stupid-replace": "0.0.3",
     "superagent": "1.8.3",

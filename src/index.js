@@ -21,7 +21,9 @@ let utils = {
     uid
 }
 
-let { startServer } = require('./lib/server')({_, debug, utils, os, pshelljs, pfs, co, process, bluebird})
+let semaphore = require('promise-semaphore')
+
+let { startServer } = require('./lib/server')({_, debug, utils, os, pshelljs, pfs, co, process, bluebird, semaphore})
 
 
 let getOptions = doc => {
@@ -29,8 +31,9 @@ let getOptions = doc => {
     let o = $d(doc)
     let help = $o('-h', '--help', false, o)
     let port = $o('-p', '--port', 3000, o);
+    let number = $o('-n', '--number', 1, o);
     return {
-        help, port
+        help, port, number
     }
 }
 
@@ -38,12 +41,12 @@ let getOptions = doc => {
 let main = () => {
     $f.readLocal('docs/usage.md').then(it => {
         let {
-            help, port
+            help, port, number
         } = getOptions(it);
         if (help) {
             console.log(it)
         } else {
-            startServer(port)
+            startServer({port, number})
         }
     })
 }

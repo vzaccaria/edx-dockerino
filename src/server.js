@@ -8,8 +8,12 @@ let b64 = require('base64-url')
 let _module = (modules) => {
 
     let {
-        runPayload, setup, isBusy
+        runPayload, setup
     } = require('./payload')(modules)
+
+    let { _, semaphore, co } = modules;
+
+    let sem = {};
 
     let extractPayload = function(req) {
         let xqueueBody = JSON.parse(req.xqueue_body)
@@ -37,6 +41,11 @@ let _module = (modules) => {
         }
     }
 
+    // Koa supports promises, so we can return a promise to it
+    function gatedProcessRequest() {
+        return sem.add(co(processRequest).bind(this))
+    }  
+
     function* processRequest() {
         let body = yield parse.json(this.req)
         let payload = extractPayload(body)
@@ -45,10 +54,17 @@ let _module = (modules) => {
         this.response.status = 200
     }
 
-    let startServer = (port = 3000) => {
+    let startServer = ({port, number}) => {
+        if(_.isUndefined(port)) {
+            port = 3000; 
+        }
+        if(_.isUndefined(number)) {
+            number = 1;
+        }
         setup()
         let app = require('koa')();
         let router = require('koa-router')();
+        sem = new semaphore({ rooms: number });
 
 
         app.use(router.routes())
@@ -56,18 +72,15 @@ let _module = (modules) => {
 
         app.use(router.routes());
 
-        router.post("/payload", processRequest);
+        router.post("/payload", gatedProcessRequest);
 
         router.post("/status", function*() {
-            if(isBusy()) {
-                this.response.status = 503 // server not available
-            } else {
                 this.response.status = 204 // ok, but no response
-            }
         })
 
         let server = app.listen(port, () => {
             info(`App listening on port ${port}.`);
+            info(`serving ${number} concurrent requests.`);
         });
 
 
