@@ -1,6 +1,7 @@
 
 # New features
 
+-     add script for integration test -- [May 3rd 16](../../commit/391bdd398842d42a890ce906b9e180dffe2f38c4)
 -     add timeout -- [May 3rd 16](../../commit/62edb6b7807e2ee9f46b6f008ee46fe888d87d7b)
 -     add docker tls verify -- [Apr 29th 16](../../commit/59c4e8f20689a5945b9449f44921e7637a7cd38e)
 -     add makefile and tls verify to kube-up -- [Apr 28th 16](../../commit/7bba227b6a644e3cb60f9091506ef81d183dadb5)
@@ -14,6 +15,7 @@
 
 # Bug fixes
 
+-     test output -- [May 3rd 16](../../commit/807839d9799d7796b25d8b5f1e4692c919b4834d)
 -     test port -- [Apr 24th 16](../../commit/04ac16d3b5583b3fe4361848fd063b4f2b8cb3bd)
 -     add missing dep -- [Apr 24th 16](../../commit/266319f825049f4b1cdfcedbdf29fcc7e72dd3ee)
 -     update deps -- [Apr 24th 16](../../commit/2c4dd07746740dce6ec01aa7efb0659f8bb1340f)
