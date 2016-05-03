@@ -40,7 +40,8 @@ let _module = ({
 
         return new bluebird((resolve) => {
             pshelljs.exec(createCommand(cmd, config), {
-                async: true
+                async: true,
+                silent: true
             }, (code, stdout) => {
                 resolve({
                     code,

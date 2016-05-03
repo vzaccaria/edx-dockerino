@@ -81,7 +81,7 @@ describe('#server (API)', () => {
 
     it('API call should report success on a good program', () => {
         let examplePacket = packet(237, "a = 1", payload);
-        console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`);
+        //console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`);
         return agent.post(`${ENDPOINT}/payload`).set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(resp.body).to.contain({
                 correct: true,
@@ -91,7 +91,7 @@ describe('#server (API)', () => {
     });
     it('API call should report a failed assertion', () => {
         let examplePacket = packet(237, "a = 2", payload);
-        console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`);
+        //console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`);
         return agent.post(`${ENDPOINT}/payload`).set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(resp.body).to.contain({
                 correct: false,
@@ -100,8 +100,8 @@ describe('#server (API)', () => {
         });
     });
     it('API should timeout on a long program', () => {
-        let examplePacket = packet(237, "sleep(2); a=1", payload);
-        console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`);
+        let examplePacket = packet(237, "sleep(10); a=1", payload);
+        //console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`);
         return agent.post(`${ENDPOINT}/payload`).set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(resp.body).to.contain({
                 correct: false,
