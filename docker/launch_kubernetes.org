@@ -1,0 +1,58 @@
+
+
+
+* Check current status
+#+begin_src sh :results raw
+export DOCKER_CERT_PATH=/Users/zaccaria/dotfiles/zprezto/.zprezto-zack/Darwin/qnap-certs
+export DOCKER_HOST=tcp://localhost:2376
+export DOCKER_TLS_VERIFY=true
+docker ps
+#+end_src
+
+#+RESULTS:
+CONTAINER ID        IMAGE                                             COMMAND                  CREATED             STATUS              PORTS                    NAMES
+e5ffc49440cb        gcr.io/google_containers/hyperkube-amd64:v1.2.3   "/hyperkube kubelet -"   5 minutes ago       Up 29 seconds                                kubelet
+e9a8eed8f872        vztrain                                           "vz-train bot"           25 hours ago        Up 25 hours                                  modest_blackwell
+34802771ff72        striderdockerfile_strider                         "/home/strider/node_m"   4 weeks ago         Up 4 weeks          0.0.0.0:3000->3000/tcp   striderdockerfile_strider_1
+9b0e86100532        mongo:3.0                                         "/entrypoint.sh mongo"   8 weeks ago         Up 4 weeks          27017/tcp                striderdockerfile_mongo_1
+
+* Start kubernetes
+[[https://github.com/kubernetes/kubernetes/blob/master/docs/admin/kubelet.md#options][Link: Kubelet options page]]
+[[https://docs.docker.com/v1.8/reference/commandline/run/][Link: Docker run page]]
+[[http://kubernetes.io/docs/getting-started-guides/docker/][Link: Kubernetes on Docker]]
+
+#+begin_src sh :results raw
+export DOCKER_CERT_PATH=/Users/zaccaria/dotfiles/zprezto/.zprezto-zack/Darwin/qnap-certs
+ #export DOCKER_HOST=tcp://localhost:2376
+export DOCKER_HOST=tcp://192.168.1.120:2376
+export DOCKER_TLS_VERIFY=true
+ #--address=0.0.0.0 
+docker run \
+    --volume=/:/rootfs:ro \
+    --volume=/sys:/sys:ro \
+    --volume=/var/lib/docker/:/var/lib/docker:rw \
+    --volume=/var/lib/kubelet/:/var/lib/kubelet:rw \
+    --volume=/var/run:/var/run:rw \
+    --net=host \
+    --pid=host \
+    --privileged=true \
+    --name=kubelet \
+    -d \
+    gcr.io/google_containers/hyperkube-amd64:v1.2.3 \
+    /hyperkube kubelet \
+        --containerized \
+        --address="0.0.0.0" \
+        --hostname-override="127.0.0.1" \
+        --api-servers=http://localhost:8888\
+        --config=/etc/kubernetes/manifests \
+        --cluster-dns=10.0.0.10 \
+        --cluster-domain=cluster.local \
+        --allow-privileged=true --v=2
+#+end_src
+
+#+RESULTS:
+19a4bf49bf3eec53f5506b8e10125b681a79419bf1a6b95a74a0ddae31f46b1c
+
+* Stop kubernetes
+	docker ps -a | grep --color=auto k8 | cut -d ' ' -f 1 | xargs docker stop
+	docker ps -a | grep --color=auto kubelet | cut -d ' ' -f 1 | xargs docker stop

@@ -3,11 +3,11 @@
 
 require('babel-polyfill');
 
-var _messages = require('./lib/messages');
+//import { warn, info } from './lib/messages';
 
 var _require =
 // $r.stdin() -> Promise  ;; to read from stdin
-require('zaccaria-cli');
+require('zaccaria-cli'); /* jshint asi:false */
 
 var $d = _require.$d;
 var $o = _require.$o;
@@ -42,8 +42,9 @@ var getOptions = function getOptions(doc) {
     var help = $o('-h', '--help', false, o);
     var port = $o('-p', '--port', 3000, o);
     var number = $o('-n', '--number', 1, o);
+    var timeout = $o('-t', '--timeout', 1, o);
     return {
-        help: help, port: port, number: number
+        help: help, port: port, number: number, timeout: timeout
     };
 };
 
@@ -54,11 +55,12 @@ var main = function main() {
         var help = _getOptions.help;
         var port = _getOptions.port;
         var number = _getOptions.number;
+        var timeout = _getOptions.timeout;
 
         if (help) {
             console.log(it);
         } else {
-            startServer({ port: port, number: number });
+            startServer({ port: port, number: number, timeout: timeout });
         }
     });
 };
