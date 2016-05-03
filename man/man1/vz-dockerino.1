@@ -18,13 +18,14 @@ npm\ install\ vz\-dockerino
 .nf
 \f[C]
 Usage:
-\ \ \ \ vz\-dockerino\ [\ \-p\ PORT\ ]\ [\ \-n\ NUM\ ]
+\ \ \ \ vz\-dockerino\ [\ \-p\ PORT\ ]\ [\ \-n\ NUM\ ]\ [\ \-t\ SEC\ ]
 \ \ \ \ vz\-dockerino\ (\ \-h\ |\ \-\-help\ )
 
 Options:
 \ \ \ \ \-h,\ \-\-help\ \ \ \ \ \ \ \ \ \ \ \ \ \ help\ for\ vz\-dockerino
 \ \ \ \ \-p,\ \-\-port\ PORT\ \ \ \ \ \ \ \ \ port\ on\ which\ to\ listen\ (default:\ 3000)
 \ \ \ \ \-n,\ \-\-number\ NUM\ \ \ \ \ \ \ \ number\ of\ concurrent\ requests\ that\ can\ be\ managed
+\ \ \ \ \-t,\ \-\-timeout\ SEC\ \ \ \ \ \ \ timeout\ in\ seconds\ (default:\ 1)
 
 Commands:
 
@@ -76,6 +77,15 @@ Released under the BSD License.
 .PP
    *   *   *   *   *
 .SH New features
+.IP \[bu] 2
+add timeout \-\- May 3rd
+16 (../../commit/62edb6b7807e2ee9f46b6f008ee46fe888d87d7b)
+.IP \[bu] 2
+add docker tls verify \-\- Apr 29th
+16 (../../commit/59c4e8f20689a5945b9449f44921e7637a7cd38e)
+.IP \[bu] 2
+add makefile and tls verify to kube\-up \-\- Apr 28th
+16 (../../commit/7bba227b6a644e3cb60f9091506ef81d183dadb5)
 .IP \[bu] 2
 add concurrent requests setting \-\- Apr 26th
 16 (../../commit/c6cba1e58a1b7fba50f9d297d95ba27d6f458d75)

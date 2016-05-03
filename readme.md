@@ -12,13 +12,14 @@ npm install vz-dockerino
 
 ```
 Usage:
-    vz-dockerino [ -p PORT ] [ -n NUM ]
+    vz-dockerino [ -p PORT ] [ -n NUM ] [ -t SEC ]
     vz-dockerino ( -h | --help )
 
 Options:
     -h, --help              help for vz-dockerino
     -p, --port PORT         port on which to listen (default: 3000)
     -n, --number NUM        number of concurrent requests that can be managed
+    -t, --timeout SEC       timeout in seconds (default: 1)
 
 Commands:
 
@@ -76,6 +77,9 @@ Released under the BSD License.
 
 # New features
 
+-     add timeout -- [May 3rd 16](../../commit/62edb6b7807e2ee9f46b6f008ee46fe888d87d7b)
+-     add docker tls verify -- [Apr 29th 16](../../commit/59c4e8f20689a5945b9449f44921e7637a7cd38e)
+-     add makefile and tls verify to kube-up -- [Apr 28th 16](../../commit/7bba227b6a644e3cb60f9091506ef81d183dadb5)
 -     add concurrent requests setting -- [Apr 26th 16](../../commit/c6cba1e58a1b7fba50f9d297d95ba27d6f458d75)
 -     working towards kubernetes containerization -- [Apr 20th 16](../../commit/31f589b303c58322434bd4d8400c4b942dd38fd0)
 -     add busy indicator -- [Apr 12th 16](../../commit/cf7dd4f940e3281c1f8153774b1e74a5ea3683a9)
