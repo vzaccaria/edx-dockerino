@@ -1,20 +1,31 @@
+Setup del container con il grader
+=================================
 
-# Queues 
+-   Il grader e' disponibile come immagine su dockerhub. Dovrebbe
+    bastare questa linea comando per lanciarlo come demone (`-d`) sulla
+    porta 3000:
 
-* To check if xqueue is running:
+    ``` shell
+    docker run -d -p 3000:3000 vzaccaria/dockerino:0.0.6
+    ```
 
-``` shell
-sudo /edx/bin/supervisorctl -c /edx/etc/supervisord.conf status
-```
- 
-* To add a queue:
+-   Per mapparlo su una porta `Y` differente, usare:
 
-    1. edit /edx/app/xqueue/xqueue.env.json
-    2. add a new queue: `{ "extgrad.octave.pah.polimi.it": "http://192.168.1.106:1666" }`
+    ``` shell
+    docker run -d -p <<Y>>:3000 vzaccaria/dockerino:0.0.6
+    ```
 
-## To restart the EDX studio
+Setup di EDX:
+=============
 
-``` shell
-sudo /edx/bin/supervisorctl -c /edx/etc/supervisord.conf restart edxapp:
-```
+-   Controllare che xqueue stia girando
 
+    ``` shell
+    sudo /edx/bin/supervisorctl -c /edx/etc/supervisord.conf status
+    ```
+
+-   Per aggiungere una coda:
+
+    1.  edit /edx/app/xqueue/xqueue.env.json
+    2.  add a new queue: `{ "octave": "http://<<IPMACCHINAGRADER>>:3000" }`
+-   Far ripartire edx?

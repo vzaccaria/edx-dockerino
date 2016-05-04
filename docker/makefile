@@ -1,7 +1,7 @@
 
-#
-# run: make tag-0.3
-#
+# Update version in docker file (0.0.X)
+# run: make tag-0.0.X
+#      make push-0.0.X
 
 tag-%:
 	docker --tlsverify build -t dockerino-v$* .
