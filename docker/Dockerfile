@@ -3,7 +3,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update
 RUN apt-get install -y octave
-RUN npm i vz-dockerino@0.0.6 -g
+RUN npm i vz-dockerino@0.0.7 -g
 RUN groupadd -r dockerino && useradd -r -g dockerino dockerino
 USER dockerino
 CMD ["vz-dockerino"]
