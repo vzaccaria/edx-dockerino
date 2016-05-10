@@ -37,12 +37,9 @@ let semaphore = require('promise-semaphore');
 /*global describe, it, before, beforeEach, after, afterEach */
 
 let payload = {
-    code: {
         lang: 'octave',
         context: '',
         validation: 'assert(a==1)'
-    },
-    response: "a=1"
 };
 
 let $ = (it) => JSON.stringify(it, 0, 4)

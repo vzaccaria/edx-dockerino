@@ -1,7 +1,4 @@
-function createScript({
-    code
-}, student_response) {
-
+function createScript(code , student_response) {
     let {
         validation,
         context
@@ -55,7 +52,7 @@ let _module = ({
     return {
 
         runPayload: co(function*(payload, student_response, config) {
-            if (payload.code.lang !== 'octave') {
+            if (_.isUndefined(payload.lang) || (payload.lang !== 'octave' && payload.lang !== 'matlab')) {
                 throw "language not supported";
             }
             let tmpdir = os.tmpdir();

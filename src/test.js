@@ -56,11 +56,9 @@ describe('#payload module', () => {
 });
 
 let payload = {
-    code: {
-        lang: 'octave',
-        context: '-- no context',
-        validation: 'assert(a==1)'
-    }
+    lang: 'octave',
+    context: '-- no context',
+    validation: 'assert(a==1)'
 }
 
 let record = {};

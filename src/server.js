@@ -11,13 +11,16 @@ let _module = (modules) => {
         runPayload, setup
     } = require('./payload')(modules);
 
-    let { _, semaphore, co } = modules;
+    let { _, semaphore, co, debug } = modules;
+
+    debug = debug(__filename);
 
     let sem = {};
     let _timeout;
 
     let extractPayload = function(req) {
         let xqueueBody = JSON.parse(req.xqueue_body);
+        debug(xqueueBody);
         let student_info = JSON.parse(xqueueBody.student_info);
         let student_response = xqueueBody.student_response;
         let grader_payload = JSON.parse(b64.decode(JSON.parse(xqueueBody.grader_payload).payload));
@@ -50,6 +53,7 @@ let _module = (modules) => {
     function* processRequest() {
         let body = yield parse.json(this.req);
         let payload = extractPayload(body);
+        debug("Received ", payload);
         let resp = yield runPayload(payload.grader_payload, payload.student_response, {_timeout});
         this.body = generateResponse(resp);
         this.response.status = 200;
@@ -83,6 +87,7 @@ let _module = (modules) => {
             info(`App listening on port ${port}.`);
             info(`serving ${number} concurrent requests.`);
             info(`using ${_timeout} seconds as timeout`);
+            debug("Debug mode activated.");
         });
 
 
