@@ -34,12 +34,12 @@ let _module = (modules) => {
             return {
                 correct: false,
                 score: 0,
-                message: "Wrong answer!"
+                msg: "Wrong answer!"
             };
         } else {
             return {
                 correct: true,
-                message: "OK!",
+                msg: "OK!",
                 score: (resp.score) ? resp.score : 1
             };
         }

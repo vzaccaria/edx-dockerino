@@ -82,7 +82,8 @@ describe('#server (API)', () => {
         return agent.post(`${ENDPOINT}/payload`).set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(resp.body).to.contain({
                 correct: true,
-                score: 1
+                score: 1,
+                msg: "OK!"
             });
         });
     });
@@ -92,7 +93,8 @@ describe('#server (API)', () => {
         return agent.post(`${ENDPOINT}/payload`).set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(resp.body).to.contain({
                 correct: false,
-                score: 0
+                score: 0,
+                msg: "Wrong answer!"
             });
         });
     });
@@ -102,7 +104,8 @@ describe('#server (API)', () => {
         return agent.post(`${ENDPOINT}/payload`).set('Accept', 'application/json').send(examplePacket).end().then((resp) => {
             expect(resp.body).to.contain({
                 correct: false,
-                score: 0
+                score: 0,
+                msg: "Wrong answer!"
             });
         });
     });

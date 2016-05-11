@@ -194,7 +194,8 @@ describe('#server (API)', () => {
             });
             expect(resp.body).to.contain({
                 correct: true,
-                score: 1
+                score: 1,
+                msg: "OK!"
             });
         });
     });
@@ -210,7 +211,8 @@ describe('#server (API)', () => {
             });
             expect(resp.body).to.contain({
                 correct: false,
-                score: 0
+                score: 0,
+                msg: "Wrong answer!"
             });
         });
     });
