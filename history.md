@@ -1,6 +1,7 @@
 
 # New features
 
+-     update dockerfile -- [May 10th 16](../../commit/6f15b16b01baff2f27797dcddcb2cf84f31a3332)
 -     some changes to the documentation -- [May 4th 16](../../commit/6185b6a6c1231351965ff302933a68345a321809)
 -     add script for integration test -- [May 3rd 16](../../commit/391bdd398842d42a890ce906b9e180dffe2f38c4)
 -     add timeout -- [May 3rd 16](../../commit/62edb6b7807e2ee9f46b6f008ee46fe888d87d7b)
@@ -16,6 +17,7 @@
 
 # Bug fixes
 
+-     answer format -- [May 11th 16](../../commit/6f048cc9a9f1b23dba33fb24746ac8d549b18b87)
 -     remove wrong nesting -- [May 10th 16](../../commit/3738604c32fedfc812d09019c98b7a0419954d5c)
 -     test output -- [May 3rd 16](../../commit/807839d9799d7796b25d8b5f1e4692c919b4834d)
 -     test port -- [Apr 24th 16](../../commit/04ac16d3b5583b3fe4361848fd063b4f2b8cb3bd)
