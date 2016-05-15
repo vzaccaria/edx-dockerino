@@ -1,6 +1,7 @@
 
 # New features
 
+-     increase timeout for older machines -- [May 15th 16](../../commit/583f792b045b8bfd18754d4c0e0c66a890aa57ee)
 -     log execution time -- [May 15th 16](../../commit/14b0f8cba9968304131390e850b0124837ae8cfe)
 -     update dockerfile -- [May 10th 16](../../commit/6f15b16b01baff2f27797dcddcb2cf84f31a3332)
 -     some changes to the documentation -- [May 4th 16](../../commit/6185b6a6c1231351965ff302933a68345a321809)
