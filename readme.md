@@ -95,6 +95,7 @@ Released under the BSD License.
 
 # Bug fixes
 
+-     remove mocha timeouts -- [May 15th 16](../../commit/e9c13e228eea4db7b13509d7d1c6a5abcc8b013f)
 -     answer format -- [May 11th 16](../../commit/6f048cc9a9f1b23dba33fb24746ac8d549b18b87)
 -     remove wrong nesting -- [May 10th 16](../../commit/3738604c32fedfc812d09019c98b7a0419954d5c)
 -     test output -- [May 3rd 16](../../commit/807839d9799d7796b25d8b5f1e4692c919b4834d)
