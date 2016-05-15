@@ -77,7 +77,7 @@ describe('#server (API)', () => {
 
     let app;
         before(() => {
-            app = server.startServer({port: 3000});
+            app = server.startServer({port: 3000, timeout: 3});
         });
 
     it('API call should report success on a good program', () => {
@@ -102,7 +102,7 @@ describe('#server (API)', () => {
             });
         });
     });
-    it('API should timeout on a long program', () => {
+    it('API should timeout (after 3s) on a long (10s) program', () => {
         let examplePacket = packet(237, "sleep(10); a=1", payload);
         //console.log(`curl -X POST -H "Content-Type: application/json" -d '${JSON.stringify(examplePacket)}' http://localhost:3000/payload`);
         return agent.post(`${ENDPOINT}/payload`).set('Accept', 'application/json').send(examplePacket).end().then((resp) => {

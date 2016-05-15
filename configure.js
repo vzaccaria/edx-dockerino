@@ -59,7 +59,7 @@ generateProject(_ => {
 
     _.collect("test-local-endpoint", _ => {
         _.cmd("make all")
-        _.cmd("mocha lib/testEndPoint.js")
+        _.cmd("mocha --no-timeouts lib/testEndPoint.js")
     })
 
 
