@@ -78,7 +78,7 @@ let getOptions = doc => {
     let help = $o('-h', '--help', false, o);
     let port = $o('-p', '--port', 3000, o);
     let number = $o('-n', '--number', 1, o);
-    let timeout = $o('-t', '--timeout', 1, o);
+    let timeout = $o('-t', '--timeout', 5, o);
     return {
         help,
         port,
