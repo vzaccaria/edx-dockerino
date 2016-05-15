@@ -62,9 +62,13 @@ let packet = (anonimized_id, response, payload) => {
     };
 };
 
+
+let log = () => {};
+
 let utils = {
-    uid
-}
+    uid,
+    log
+};
 
 describe('#server (API)', () => {
         let server = require('./server')({

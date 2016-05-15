@@ -1,4 +1,4 @@
-function createScript(code , student_response) {
+function createScript(code, student_response) {
     let {
         validation,
         context
@@ -48,6 +48,16 @@ let _module = ({
         });
     };
 
+    let {
+        log
+    } = utils;
+
+    function getLogMsg(responseTime) {
+        let nano = responseTime[1];
+        let secs = responseTime[0];
+        responseTime = secs * 1000 + nano / 1000000;
+        return `executionTime: ${responseTime}`;
+    }
 
     return {
 
@@ -63,8 +73,15 @@ let _module = ({
                 let script = createScript(payload, student_response);
                 yield pfs.writeFileAsync(`${sandboxdir}/script.m`, script, 'utf8');
                 process.cwd(sandboxdir);
+
+                let startTime = process.hrtime();
+
                 let r = yield execAsync(`${octaveCommand} --silent ${sandboxdir}/script.m`, config);
+
+                let timeDiff = process.hrtime(startTime);
+
                 pshelljs.rm('-rf', sandboxdir);
+                log(getLogMsg(timeDiff));
                 return {
                     executed: true,
                     result: r

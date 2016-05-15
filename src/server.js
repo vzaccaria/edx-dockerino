@@ -99,4 +99,4 @@ let _module = (modules) => {
     };
 }
 
-module.exports = _module
+module.exports = _module;

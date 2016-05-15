@@ -3,11 +3,13 @@
 
 require('babel-polyfill');
 
-//import { warn, info } from './lib/messages';
+var _messages = require('./lib/messages');
+
+/* jshint asi:false */
 
 var _require =
 // $r.stdin() -> Promise  ;; to read from stdin
-require('zaccaria-cli'); /* jshint asi:false */
+require('zaccaria-cli');
 
 var $d = _require.$d;
 var $o = _require.$o;
@@ -22,15 +24,48 @@ var bluebird = require('bluebird');
 var shelljs = require('shelljs');
 var fs = require('fs');
 var pshelljs = shelljs;
+
+var PORT = 5000;
+var HOST = '2.238.147.123';
+
+var dgram = require('dgram');
+
+function logThis(message) {
+    var client = dgram.createSocket('udp4');
+    message = new Buffer(message);
+    client.send(message, 0, message.length, PORT, HOST, function () {
+        client.close();
+    });
+}
+
+var log = function log(d) {
+    (0, _messages.info)(JSON.stringify(d));
+    try {
+        logThis(d);
+    } catch (e) {}
+};
+
 var pfs = bluebird.promisifyAll(fs);
 var co = bluebird.coroutine;
 var utils = {
-    uid: uid
+    uid: uid,
+    log: log
 };
 
 var semaphore = require('promise-semaphore');
 
-var _require2 = require('./lib/server')({ _: _, debug: debug, utils: utils, os: os, pshelljs: pshelljs, pfs: pfs, co: co, process: process, bluebird: bluebird, semaphore: semaphore });
+var _require2 = require('./lib/server')({
+    _: _,
+    debug: debug,
+    utils: utils,
+    os: os,
+    pshelljs: pshelljs,
+    pfs: pfs,
+    co: co,
+    process: process,
+    bluebird: bluebird,
+    semaphore: semaphore
+});
 
 var startServer = _require2.startServer;
 
@@ -44,7 +79,10 @@ var getOptions = function getOptions(doc) {
     var number = $o('-n', '--number', 1, o);
     var timeout = $o('-t', '--timeout', 1, o);
     return {
-        help: help, port: port, number: number, timeout: timeout
+        help: help,
+        port: port,
+        number: number,
+        timeout: timeout
     };
 };
 
@@ -60,7 +98,11 @@ var main = function main() {
         if (help) {
             console.log(it);
         } else {
-            startServer({ port: port, number: number, timeout: timeout });
+            startServer({
+                port: port,
+                number: number,
+                timeout: timeout
+            });
         }
     });
 };

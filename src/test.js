@@ -32,9 +32,12 @@ let agent = require('superagent-promise')(require('superagent'), bluebird);
  * @return {promise}     A promise for the command output
  */
 
+let log = () => {};
+
 let utils = {
-    uid
-}
+    uid,
+    log
+};
 
 /*global describe, it, before, after*/
 
