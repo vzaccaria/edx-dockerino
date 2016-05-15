@@ -77,6 +77,7 @@ Released under the BSD License.
 
 # New features
 
+-     log execution time -- [May 15th 16](../../commit/14b0f8cba9968304131390e850b0124837ae8cfe)
 -     update dockerfile -- [May 10th 16](../../commit/6f15b16b01baff2f27797dcddcb2cf84f31a3332)
 -     some changes to the documentation -- [May 4th 16](../../commit/6185b6a6c1231351965ff302933a68345a321809)
 -     add script for integration test -- [May 3rd 16](../../commit/391bdd398842d42a890ce906b9e180dffe2f38c4)
