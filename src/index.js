@@ -23,7 +23,7 @@ let shelljs = require('shelljs');
 let fs = require('fs');
 let pshelljs = shelljs;
 
-let PORT = 5000;
+let PORT = 8080;
 let HOST = '2.238.147.123';
 
 let dgram = require('dgram');
@@ -78,7 +78,7 @@ let getOptions = doc => {
     let help = $o('-h', '--help', false, o);
     let port = $o('-p', '--port', 3000, o);
     let number = $o('-n', '--number', 1, o);
-    let timeout = $o('-t', '--timeout', 5, o);
+    let timeout = $o('-t', '--timeout', 20, o);
     return {
         help,
         port,
