@@ -52,6 +52,7 @@
     "promise-semaphore": "0.2.7",
     "semaphore": "1.0.5",
     "shelljs": "0.5.1",
+    "string": "3.3.1",
     "stupid-replace": "0.0.3",
     "superagent": "1.8.3",
     "superagent-promise": "1.1.0",

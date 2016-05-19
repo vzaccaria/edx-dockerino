@@ -1,3 +1,7 @@
+
+let _string = require('string');
+let _deh = (s) => _string(s).decodeHTMLEntities().s;
+
 function createScript(code, student_response) {
     let {
         validation,
@@ -5,11 +9,12 @@ function createScript(code, student_response) {
     } = code;
 
     return `
-    ${context}
-    ${student_response}
-    ${validation}
+    ${_deh(context)}
+    ${_deh(student_response)}
+    ${_deh(validation)}
     `;
 }
+
 
 let _module = ({
     co,
@@ -59,6 +64,8 @@ let _module = ({
         return `executionTime: ${responseTime}`;
     }
 
+    debug = debug(__filename);
+   
     return {
 
         runPayload: co(function*(payload, student_response, config) {
@@ -71,13 +78,14 @@ let _module = ({
             pshelljs.mkdir('-p', sandboxdir);
             try {
                 let script = createScript(payload, student_response);
+                debug(script);
                 yield pfs.writeFileAsync(`${sandboxdir}/script.m`, script, 'utf8');
                 process.cwd(sandboxdir);
 
                 let startTime = process.hrtime();
 
                 let r = yield execAsync(`${octaveCommand} --silent ${sandboxdir}/script.m`, config);
-
+                debug(r)
                 let timeDiff = process.hrtime(startTime);
 
                 pshelljs.rm('-rf', sandboxdir);
