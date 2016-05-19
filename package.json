@@ -1,6 +1,6 @@
 {
   "name": "vz-dockerino",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Small container to execute external student octave programs",
   "main": "index.js",
   "bin": {
