@@ -95,6 +95,7 @@ Released under the BSD License.
 
 # Bug fixes
 
+-     issue with html entities -- [May 19th 16](../../commit/033412c1067d39eae6bf6b3799c7bcab5a452ea0)
 -     increase timout -- [May 17th 16](../../commit/8404dc14a34c607ebfbc41890ff60c9368e846a6)
 -     remove mocha timeouts -- [May 15th 16](../../commit/e9c13e228eea4db7b13509d7d1c6a5abcc8b013f)
 -     answer format -- [May 11th 16](../../commit/6f048cc9a9f1b23dba33fb24746ac8d549b18b87)
