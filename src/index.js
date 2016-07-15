@@ -10,10 +10,12 @@ import {
 let {
     $d,
     $o,
-    $f
+    $f,
+    $fs
     // $r.stdin() -> Promise  ;; to read from stdin
 } = require('zaccaria-cli');
 
+const path = require('path');
 let _ = require('lodash');
 let debug = require('debug');
 let uid = require('uid');
@@ -27,6 +29,13 @@ let PORT = 8080;
 let HOST = '2.238.147.123';
 
 let dgram = require('dgram');
+
+let readLocal = f => {
+    const curdir = path.dirname($fs.realpathSync(__filename));
+    const filepath = path.join(curdir, `${f}`);
+    return $fs.readFileAsync(filepath, 'utf8');
+}
+
 
 function logThis(message) {
     var client = dgram.createSocket('udp4');
@@ -89,7 +98,7 @@ let getOptions = doc => {
 
 
 let main = () => {
-    $f.readLocal('docs/usage.md').then(it => {
+    readLocal('docs/usage.md').then(it => {
         let {
             help,
             port,

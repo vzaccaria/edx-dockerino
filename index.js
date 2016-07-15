@@ -14,8 +14,10 @@ require('zaccaria-cli');
 var $d = _require.$d;
 var $o = _require.$o;
 var $f = _require.$f;
+var $fs = _require.$fs;
 
 
+var path = require('path');
 var _ = require('lodash');
 var debug = require('debug');
 var uid = require('uid');
@@ -29,6 +31,12 @@ var PORT = 8080;
 var HOST = '2.238.147.123';
 
 var dgram = require('dgram');
+
+var readLocal = function readLocal(f) {
+    var curdir = path.dirname($fs.realpathSync(__filename));
+    var filepath = path.join(curdir, '' + f);
+    return $fs.readFileAsync(filepath, 'utf8');
+};
 
 function logThis(message) {
     var client = dgram.createSocket('udp4');
@@ -87,7 +95,7 @@ var getOptions = function getOptions(doc) {
 };
 
 var main = function main() {
-    $f.readLocal('docs/usage.md').then(function (it) {
+    readLocal('docs/usage.md').then(function (it) {
         var _getOptions = getOptions(it);
 
         var help = _getOptions.help;
