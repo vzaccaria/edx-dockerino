@@ -1,5 +1,8 @@
 import {
-    warn, info
+    warn,
+    info,
+    error
+   
 }
 from './messages';
 let parse = require('co-body');
@@ -8,10 +11,16 @@ let b64 = require('base64-url');
 let _module = (modules) => {
 
     let {
-        runPayload, setup
+        runPayload,
+        setup
     } = require('./payload')(modules);
 
-    let { _, semaphore, co, debug } = modules;
+    let {
+        _,
+        semaphore,
+        co,
+        debug
+    } = modules;
 
     debug = debug(__filename);
 
@@ -25,7 +34,9 @@ let _module = (modules) => {
         let student_response = xqueueBody.student_response;
         let grader_payload = JSON.parse(b64.decode(JSON.parse(xqueueBody.grader_payload).payload));
         return {
-            student_info, student_response, grader_payload
+            student_info,
+            student_response,
+            grader_payload
         };
     };
 
@@ -48,39 +59,57 @@ let _module = (modules) => {
     // Koa supports promises, so we can return a promise to it
     function gatedProcessRequest() {
         return sem.add(co(processRequest).bind(this));
-    }  
-
-    function* processRequest() {
-        let body = yield parse.json(this.req);
-        let payload = extractPayload(body);
-        debug("Received ", payload);
-        let resp = yield runPayload(payload.grader_payload, payload.student_response, {_timeout});
-        this.body = generateResponse(resp);
-        this.response.status = 200;
     }
 
-    let startServer = ({port, number, timeout}) => {
-        _timeout = timeout || 1.0;
-        if(_.isUndefined(port)) {
-            port = 3000; 
+    function* processRequest() {
+        try {
+            let body = yield parse.json(this.req);
+            let payload = extractPayload(body);
+            debug("Received ", payload);
+            let resp = yield runPayload(payload.grader_payload, payload.student_response, {
+                _timeout
+            });
+            this.body = generateResponse(resp);
+            this.response.status = 200;
+        } catch (e) {
+            error(e);
+            this.body = {
+                correct: false,
+                score: 0,
+                msg: e
+            };
+            this.response.status = 200;
         }
-        if(_.isUndefined(number)) {
+    }
+
+    let startServer = ({
+        port,
+        number,
+        timeout
+    }) => {
+        _timeout = timeout || 1.0;
+        if (_.isUndefined(port)) {
+            port = 3000;
+        }
+        if (_.isUndefined(number)) {
             number = 1;
         }
         setup();
         let app = require('koa')();
         let router = require('koa-router')();
-        sem = new semaphore({ rooms: number });
+        sem = new semaphore({
+            rooms: number
+        });
 
         app.use(router.routes())
-           .use(router.allowedMethods());
+            .use(router.allowedMethods());
 
         app.use(router.routes());
 
         router.post("/payload", gatedProcessRequest);
 
         router.post("/status", function*() {
-            this.response.status = 204 ;// ok, but no response
+            this.response.status = 204; // ok, but no response
         });
 
         let server = app.listen(port, () => {
@@ -95,7 +124,8 @@ let _module = (modules) => {
 
     };
     return {
-        startServer, extractPayload
+        startServer,
+        extractPayload
     };
 }
 

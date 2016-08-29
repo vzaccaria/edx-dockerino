@@ -64,6 +64,12 @@ let payload = {
     validation: 'assert(a==1)'
 }
 
+let wrongpayload= {
+    lang: 'quiz',
+    context: '-- no context',
+    validation: 'assert(a==1)'
+}
+
 let record = {};
 
 function mockModulesForGood(fail) {
@@ -180,6 +186,7 @@ describe('#server (API)', () => {
     });
 
     let examplePacket = packet(237, "a = 2", payload);
+    let wrongPacket = packet(237, "a = 1", wrongpayload);
     let app;
     before(() => {
         app = server.startServer({port: 4000});
@@ -216,6 +223,16 @@ describe('#server (API)', () => {
                 correct: false,
                 score: 0,
                 msg: "Wrong answer!"
+            });
+        });
+    });
+    it('API call should trigger program execution - program generates run payload exception', () => {
+        mockModulesForGood(true);
+        return agent.post('http://localhost:4000/payload').set('Accept', 'application/json').send(wrongPacket).end().then((resp) => {
+            expect(resp.body).to.contain({
+                correct: false,
+                score: 0,
+                msg: "language not supported"
             });
         });
     });
