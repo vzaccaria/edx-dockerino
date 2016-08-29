@@ -19,6 +19,7 @@
 
 # Bug fixes
 
+-     handle exception on the processRequest path -- [Aug 29th 16](../../commit/aff6daf001aa05bee28f4eb06efb7054a5346c55)
 -     changes to enable position independent read of docs/usage -- [Jul 15th 16](../../commit/e55ef0228b0575f279ac93358a8eb445a5d9ecbb)
 -     issue with html entities -- [May 19th 16](../../commit/033412c1067d39eae6bf6b3799c7bcab5a452ea0)
 -     increase timout -- [May 17th 16](../../commit/8404dc14a34c607ebfbc41890ff60c9368e846a6)
