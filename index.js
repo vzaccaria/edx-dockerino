@@ -7,15 +7,11 @@ var _messages = require('./lib/messages');
 
 /* jshint asi:false */
 
-var _require =
-// $r.stdin() -> Promise  ;; to read from stdin
-require('zaccaria-cli');
-
-var $d = _require.$d;
-var $o = _require.$o;
-var $f = _require.$f;
-var $fs = _require.$fs;
-
+var _require = require('zaccaria-cli'),
+    $d = _require.$d,
+    $o = _require.$o,
+    $f = _require.$f,
+    $fs = _require.$fs;
 
 var path = require('path');
 var _ = require('lodash');
@@ -73,10 +69,8 @@ var _require2 = require('./lib/server')({
     process: process,
     bluebird: bluebird,
     semaphore: semaphore
-});
-
-var startServer = _require2.startServer;
-
+}),
+    startServer = _require2.startServer;
 
 var getOptions = function getOptions(doc) {
     "use strict";
@@ -96,12 +90,11 @@ var getOptions = function getOptions(doc) {
 
 var main = function main() {
     readLocal('docs/usage.md').then(function (it) {
-        var _getOptions = getOptions(it);
-
-        var help = _getOptions.help;
-        var port = _getOptions.port;
-        var number = _getOptions.number;
-        var timeout = _getOptions.timeout;
+        var _getOptions = getOptions(it),
+            help = _getOptions.help,
+            port = _getOptions.port,
+            number = _getOptions.number,
+            timeout = _getOptions.timeout;
 
         if (help) {
             console.log(it);
