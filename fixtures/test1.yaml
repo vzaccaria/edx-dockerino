@@ -1,0 +1,6 @@
+base: xyz
+solution: xyz
+validation: |
+  if(a~=3) return 0 else return 1
+context: ""
+lang: octave
