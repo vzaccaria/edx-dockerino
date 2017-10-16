@@ -1,124 +1,147 @@
-/* jshint asi:false */
-
 import "babel-polyfill";
 
-import {
-    warn,
-    info
-} from './lib/messages';
+import { info } from "./lib/messages";
 
 let {
-    $d,
-    $o,
-    $f,
-    $fs
-    // $r.stdin() -> Promise  ;; to read from stdin
-} = require('zaccaria-cli');
+  $yaml
+  // $r.stdin() -> Promise  ;; to read from stdin
+} = require("zaccaria-cli");
 
-const path = require('path');
-let _ = require('lodash');
-let debug = require('debug');
-let uid = require('uid');
-let os = require('os');
-let bluebird = require('bluebird');
-let shelljs = require('shelljs');
-let fs = require('fs');
+let _ = require("lodash");
+let debug = require("debug");
+let uid = require("uid");
+let os = require("os");
+let bluebird = require("bluebird");
+let shelljs = require("shelljs");
+let fs = require("fs");
+let process = require("process");
 let pshelljs = shelljs;
+let agent = require("superagent-promise")(require("superagent"), bluebird);
 
 let PORT = 8080;
-let HOST = '2.238.147.123';
+let HOST = "2.238.147.123";
+let b64 = require("base64-url");
 
-let dgram = require('dgram');
+let dgram = require("dgram");
 
-let readLocal = f => {
-    const curdir = path.dirname($fs.realpathSync(__filename));
-    const filepath = path.join(curdir, `${f}`);
-    return $fs.readFileAsync(filepath, 'utf8');
-}
-
+const prog = require("caporal");
 
 function logThis(message) {
-    var client = dgram.createSocket('udp4');
-    message = new Buffer(message);
-    client.send(message, 0, message.length, PORT, HOST, function() {
-        client.close();
-    });
+  var client = dgram.createSocket("udp4");
+  message = new Buffer(message);
+  client.send(message, 0, message.length, PORT, HOST, function() {
+    client.close();
+  });
 }
 
-
-
-let log = (d) => {
-    info(JSON.stringify(d));
-    try {
-        logThis(d);
-    } catch (e) {
-
-    }
+let log = d => {
+  info(JSON.stringify(d));
+  try {
+    logThis(d);
+  } catch (e) {}
 };
 
 let pfs = bluebird.promisifyAll(fs);
 let co = bluebird.coroutine;
 let utils = {
-    uid,
-    log
+  uid,
+  log
 };
 
-let semaphore = require('promise-semaphore');
+let semaphore = require("promise-semaphore");
 
-let {
-    startServer
-} = require('./lib/server')({
-    _,
-    debug,
-    utils,
-    os,
-    pshelljs,
-    pfs,
-    co,
-    process,
-    bluebird,
-    semaphore
+let { startServer } = require("./lib/server")({
+  _,
+  debug,
+  utils,
+  os,
+  pshelljs,
+  pfs,
+  co,
+  process,
+  bluebird,
+  semaphore
 });
 
+/*
+  code: {
+  base: cha[init].value,
+  solution: cha[init + 1].value,
+  validation: cha[init + 2].value,
+  context: "",
+  lang: cha[init].lang
+  }, */
 
-let getOptions = doc => {
-    "use strict";
-    let o = $d(doc);
-    let help = $o('-h', '--help', false, o);
-    let port = $o('-p', '--port', 3000, o);
-    let number = $o('-n', '--number', 1, o);
-    let timeout = $o('-t', '--timeout', 20, o);
-    return {
-        help,
-        port,
-        number,
-        timeout
-    };
+let $ = JSON.stringify;
+
+let asPayload = code => {
+  let grader_payload = {
+    payload: b64.encode(JSON.stringify(code))
+  };
+  grader_payload = JSON.stringify(grader_payload);
+  return grader_payload;
 };
 
+let packRequest = (code, solution) => {
+  return {
+    xqueue_body: $({
+      student_info: $({
+        anonimized_id: 3281
+      }),
+
+      student_response: solution,
+      grader_payload: asPayload(code)
+    })
+  };
+};
+
+let testSolution = (endpoint, code, solution) => {
+  return agent
+    .post(endpoint)
+    .set("Accept", "application/json")
+    .send(packRequest(code, solution))
+    .end();
+};
+
+const readFile = require("mz/fs").readFile;
 
 let main = () => {
-    readLocal('docs/usage.md').then(it => {
-        let {
-            help,
-            port,
-            number,
-            timeout
-        } = getOptions(it);
-        if (help) {
-            console.log(it);
-        } else {
-            startServer({
-                port,
-                number,
-                timeout
-            });
-        }
+  prog
+    .description("Serve or run programs")
+    .command("serve", "Listens on a specified port for programs to execute")
+    .option("--port <num>", "Listen to port <num>", prog.INT, 3000)
+    .option("--number <num>", "Execute maximum <num> programs", prog.INT, 1)
+    .option("--timeout <num>", "Kill program after <num> seconds", prog.INT, 20)
+    .action((args, options) => {
+      startServer(options);
+    })
+    .command(
+      "test",
+      "Test a program (YAML format) against a running instance of dockerino"
+    )
+    .argument("EXER", "YAML file containing the exercise payload (in clear)")
+    .argument("SOL", "solution to the exercise (plain text)")
+    .option(
+      "--endpoint <url>",
+      "<url> where dockerino is listening",
+      prog.STRING,
+      "localhost:3000/payload"
+    )
+    .action((args, options) => {
+      console.log(args, options);
+      bluebird
+        .all([readFile(args.exer, "utf8"), readFile(args.sol, "utf8")])
+        .then(([f1, f2]) => {
+          let code = $yaml(f1);
+          let solution = f2;
+          testSolution(options.endpoint, code, solution).then(res => {
+            console.log(res.body);
+          });
+        });
     });
+  prog.parse(process.argv);
 };
 
 main();
-
-
 
 /* eslint quotes: [0], strict: [0] */
