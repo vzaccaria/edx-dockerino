@@ -18,6 +18,8 @@ let process = require("process");
 let pshelljs = shelljs;
 let agent = require("superagent-promise")(require("superagent"), bluebird);
 
+pshelljs.execAsync = require("mz/child_process").exec;
+
 let PORT = 8080;
 let HOST = "2.238.147.123";
 let b64 = require("base64-url");
@@ -112,6 +114,7 @@ let main = () => {
     .option("--port <num>", "Listen to port <num>", prog.INT, 3000)
     .option("--number <num>", "Execute maximum <num> programs", prog.INT, 1)
     .option("--timeout <num>", "Kill program after <num> seconds", prog.INT, 20)
+    .option("--keepfiles", "Dont remove sandboxed dir")
     .action((args, options) => {
       startServer(options);
     })
