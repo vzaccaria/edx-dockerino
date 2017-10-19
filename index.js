@@ -21,6 +21,8 @@ var process = require("process");
 var pshelljs = shelljs;
 var agent = require("superagent-promise")(require("superagent"), bluebird);
 
+pshelljs.execAsync = require("mz/child_process").exec;
+
 var PORT = 8080;
 var HOST = "2.238.147.123";
 var b64 = require("base64-url");
@@ -106,7 +108,7 @@ var testSolution = function testSolution(endpoint, code, solution) {
 var readFile = require("mz/fs").readFile;
 
 var main = function main() {
-  prog.description("Serve or run programs").command("serve", "Listens on a specified port for programs to execute").option("--port <num>", "Listen to port <num>", prog.INT, 3000).option("--number <num>", "Execute maximum <num> programs", prog.INT, 1).option("--timeout <num>", "Kill program after <num> seconds", prog.INT, 20).action(function (args, options) {
+  prog.description("Serve or run programs").command("serve", "Listens on a specified port for programs to execute").option("--port <num>", "Listen to port <num>", prog.INT, 3000).option("--number <num>", "Execute maximum <num> programs", prog.INT, 1).option("--timeout <num>", "Kill program after <num> seconds", prog.INT, 20).option("--keepfiles", "Dont remove sandboxed dir").action(function (args, options) {
     startServer(options);
   }).command("test", "Test a program (YAML format) against a running instance of dockerino").argument("EXER", "YAML file containing the exercise payload (in clear)").argument("SOL", "solution to the exercise (plain text)").option("--endpoint <url>", "<url> where dockerino is listening", prog.STRING, "localhost:3000/payload").action(function (args, options) {
     console.log(args, options);

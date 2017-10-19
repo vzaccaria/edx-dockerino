@@ -39,21 +39,24 @@ let _module = ({
   }
 
   let execAsync = (cmd, config) => {
-    return new bluebird(resolve => {
-      pshelljs.exec(
-        createCommand(cmd, config),
-        {
-          async: true,
-          silent: true
-        },
-        (code, stdout) => {
-          resolve({
-            code,
-            stdout
-          });
-        }
-      );
-    });
+    let actualCommand = createCommand(cmd, config);
+    debug(actualCommand);
+    return pshelljs.execAsync(actualCommand).then(
+      ([stdout, stderr]) => {
+        return {
+          code: 0,
+          stdout,
+          stderr
+        };
+      },
+      error => {
+        console.log(JSON.stringify(error, 0, 4));
+        return {
+          code: 1,
+          stderr: error.signal
+        };
+      }
+    );
   };
 
   let { log } = utils;
@@ -78,6 +81,7 @@ let _module = ({
       let tmpdir = os.tmpdir();
       let tuid = utils.uid();
       let sandboxdir = `${tmpdir}/${tuid}`;
+      let { _keepfiles } = config;
       pshelljs.mkdir("-p", sandboxdir);
       try {
         let script = createScript(payload, student_response);
@@ -87,21 +91,25 @@ let _module = ({
 
         let startTime = process.hrtime();
 
-        let r = yield execAsync(
-          `${octaveCommand} --silent ${sandboxdir}/script.m`,
-          config
-        );
+        let cliCommand = `${octaveCommand} --silent ${sandboxdir}/script.m`;
+
+        debug(cliCommand);
+        let r = yield execAsync(cliCommand, config);
         debug(r);
         let timeDiff = process.hrtime(startTime);
 
-        pshelljs.rm("-rf", sandboxdir);
+        if (!_keepfiles) {
+          pshelljs.rm("-rf", sandboxdir);
+        }
         log(getLogMsg(timeDiff));
         return {
           executed: true,
           result: r
         };
       } catch (e) {
-        pshelljs.rm("-rf", sandboxdir);
+        if (!_keepfiles) {
+          pshelljs.rm("-rf", sandboxdir);
+        }
         return {
           executed: false
         };
@@ -109,10 +117,10 @@ let _module = ({
     }),
 
     setup: () => {
-      if (pshelljs.test("-e", "/usr/bin/octave")) {
-        octaveCommand = "/usr/bin/octave";
-      } else if (pshelljs.test("-e", "/usr/local/bin/octave")) {
-        octaveCommand = "/usr/local/bin/octave";
+      if (pshelljs.test("-e", "/usr/bin/octave-cli")) {
+        octaveCommand = "/usr/bin/octave-cli";
+      } else if (pshelljs.test("-e", "/usr/local/bin/octave-cli")) {
+        octaveCommand = "/usr/local/bin/octave-cli";
       } else {
         throw "cannot find octave";
       }

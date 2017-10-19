@@ -1,16 +1,17 @@
-import { warn, info, error } from "./messages";
+import { info, error } from "./messages";
 let parse = require("co-body");
 let b64 = require("base64-url");
 
 let _module = modules => {
   let { runPayload, setup } = require("./payload")(modules);
 
-  let { _, semaphore, co, debug } = modules;
+  let { semaphore, co, debug } = modules;
 
   debug = debug(__filename);
 
   let sem = {};
   let _timeout;
+  let _keepfiles = false;
 
   let extractPayload = function(req) {
     let xqueueBody = JSON.parse(req.xqueue_body);
@@ -36,7 +37,7 @@ let _module = modules => {
           "Non sono riuscito ad eseguire in maniera sicura il programma. Contattare il docente e segnalare il problema"
       };
     } else {
-      if (resp.result.code === 0) {
+      if (resp.result.code !== 0) {
         return {
           correct: false,
           score: 0,
@@ -66,9 +67,11 @@ let _module = modules => {
         payload.grader_payload,
         payload.student_response,
         {
-          _timeout
+          _timeout,
+          _keepfiles
         }
       );
+      debug(resp);
       this.body = generateResponse(resp);
       this.response.status = 200;
     } catch (e) {
@@ -82,14 +85,9 @@ let _module = modules => {
     }
   }
 
-  let startServer = ({ port, number, timeout }) => {
-    _timeout = timeout || 1.0;
-    if (_.isUndefined(port)) {
-      port = 3000;
-    }
-    if (_.isUndefined(number)) {
-      number = 1;
-    }
+  let startServer = ({ port, number, timeout, keepfiles }) => {
+    _timeout = timeout;
+    _keepfiles = keepfiles;
     setup();
     let app = require("koa")();
     let router = require("koa-router")();
