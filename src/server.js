@@ -33,23 +33,28 @@ let _module = modules => {
       return {
         correct: false,
         score: 0,
-        msg:
-          "Non sono riuscito ad eseguire in maniera sicura il programma. Contattare il docente e segnalare il problema"
+        msg: "Non sono riuscito ad eseguire in maniera sicura il programma. Contattare il docente e segnalare il problema"
       };
     } else {
-      if (resp.result.code !== 0) {
-        return {
-          correct: false,
-          score: 0,
-          msg: "Wrong answer!"
-        };
-      } else {
-        return {
-          correct: true,
-          msg: "OK!",
-          score: resp.score ? resp.score : 1
-        };
+      let result = { correct: false, score: 0 };
+      switch (resp.result.code) {
+        case 0:
+          result = {
+            correct: true,
+            score: 1,
+            msg: "Esercizio svolto correttamente, complimenti!"
+          };
+          break;
+        case 1:
+          result.msg = "Il programma presenta errori di sintassi o un utilizzo sbagliato delle funzioni Matlab. Si prega di ricontrollarlo nell'ambiente Matlab locale.";
+          break;
+        case 2:
+          result.msg = " Il programma è corretto dal punto di vista sintattico ma non calcola il risultato in modo corretto.";
+          break;
+        default:
+          result.msg = "Si è verificato un errore sconosciuto. Contattare il docente con allegando il programma scritto.";
       }
+      return result;
     }
   }
 

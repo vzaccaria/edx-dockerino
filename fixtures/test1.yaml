@@ -1,6 +1,12 @@
 base: xyz
 solution: xyz
 validation: |
-  assert(a == 3)
-context: ""
+  _edx_assert(a,4);
+context: |
+  1;
+  function [] = _edx_assert(v,r)
+     if(v ~= r)
+        exit(2);
+     endif
+  endfunction
 lang: octave

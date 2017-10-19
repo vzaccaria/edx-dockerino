@@ -11,17 +11,19 @@ function createScript(code, student_response) {
     `;
 }
 
-let _module = ({
-  co,
-  _,
-  debug,
-  utils,
-  os,
-  pshelljs,
-  pfs,
-  process,
-  bluebird
-}) => {
+let _module = (
+  {
+    co,
+    _,
+    debug,
+    utils,
+    os,
+    pshelljs,
+    pfs,
+    process,
+    bluebird
+  }
+) => {
   let octaveCommand = undefined;
   let timeoutCommand = undefined;
 
@@ -41,22 +43,23 @@ let _module = ({
   let execAsync = (cmd, config) => {
     let actualCommand = createCommand(cmd, config);
     debug(actualCommand);
-    return pshelljs.execAsync(actualCommand).then(
-      ([stdout, stderr]) => {
-        return {
-          code: 0,
-          stdout,
-          stderr
-        };
-      },
-      error => {
-        console.log(JSON.stringify(error, 0, 4));
-        return {
-          code: 1,
-          stderr: error.signal
-        };
-      }
-    );
+    return pshelljs.execAsync(actualCommand).then(a => {
+      let stdout, stderr;
+      [stdout, stderr] = a;
+      debug(a);
+      return {
+        code: 0,
+        stdout,
+        stderr
+      };
+    }, error => {
+      debug(error);
+      return {
+        code: error.code,
+        stderr: "",
+        stdout: ""
+      };
+    });
   };
 
   let { log } = utils;
@@ -74,7 +77,7 @@ let _module = ({
     runPayload: co(function*(payload, student_response, config) {
       if (
         _.isUndefined(payload.lang) ||
-        (payload.lang !== "octave" && payload.lang !== "matlab")
+        payload.lang !== "octave" && payload.lang !== "matlab"
       ) {
         throw "language not supported";
       }
