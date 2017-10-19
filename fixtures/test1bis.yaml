@@ -1,7 +1,7 @@
 base: xyz
 solution: xyz
 validation: |
-  _edx_assert(a,3);
+  _edx_assert(a,4);
 context: |
   1;
   function [] = _edx_assert(v,r)
